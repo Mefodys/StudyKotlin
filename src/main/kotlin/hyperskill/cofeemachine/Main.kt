@@ -4,18 +4,9 @@ fun main() {
 
     val newCoffeeMachine = CoffeeMachine()
 
-    val cupsOfCoffee: Int = newCoffeeMachine.input()
-    val calculationResults = newCoffeeMachine.calculate(cupsOfCoffee)
-    newCoffeeMachine.output(cupsOfCoffee, calculationResults)
+    //newCoffeeMachine.inputCalcOutput()
 
-    println()
-    newCoffeeMachine.ingredientsLeft()
-
-    println()
-    newCoffeeMachine.addIngredients()
-
-    println()
-    newCoffeeMachine.ingredientsLeft()
+    newCoffeeMachine.ingridientsCalculator()
 
 
 }
