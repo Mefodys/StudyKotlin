@@ -5,10 +5,9 @@ fun main() {
     val newCoffeeMachine = CoffeeMachine()
 
     //newCoffeeMachine.inputCalcOutput()
+    //newCoffeeMachine.ingridientsCalculator()
 
-    newCoffeeMachine.ingridientsCalculator()
-
-
+    newCoffeeMachine.showInfo()
+    newCoffeeMachine.selectProgram()
+    newCoffeeMachine.showInfo()
 }
-
-
