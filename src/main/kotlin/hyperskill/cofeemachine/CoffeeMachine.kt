@@ -1,75 +1,9 @@
-//https://hyperskill.org/projects/67/stages/362
-
-package hyperskill.cofeemachine
-
-import kotlin.math.min
 
 class CoffeeMachine {
-    val water = 200
-    val milk = 50
-    val coffee = 15
+    // Status 1 - machine is running, Status 0 - machine is terminated
+    var status = 1
 
-    private fun input(): Int {
-        println("Write how many cups of coffee you will need:")
-        val cupsOfCoffee = readln().toInt()
-        return cupsOfCoffee
-    }
-
-    private fun calculate(cupsOfCoffee: Int): IntArray {
-        val resultWater = water * cupsOfCoffee
-        val resultMilk = milk * cupsOfCoffee
-        val resultCoffee = coffee * cupsOfCoffee
-
-        return intArrayOf(resultWater, resultMilk, resultCoffee)
-    }
-
-    private fun output(cupsOfCoffee: Int, calculationResults: IntArray) {
-        println("For $cupsOfCoffee cups of coffee you will need:")
-        print(
-            """
-        ${calculationResults[0]} ml of water
-        ${calculationResults[1]} ml of milk
-        ${calculationResults[2]} g of coffee beans
-        """.trimIndent()
-        )
-    }
-
-    private fun inputCalcOutput() {
-        val cupsOfCoffee: Int = this.input()
-        val calculationResults = this.calculate(cupsOfCoffee)
-        this.output(cupsOfCoffee, calculationResults)
-    }
-
-
-    fun ingridientsCalculator() {
-        println("Write how many ml of water the coffee machine has:")
-        val waterYouHave = readln().toInt()
-        println("Write how many ml of milk the coffee machine has:")
-        val milkYouHave = readln().toInt()
-        println("Write how many grams of coffee beans the coffee machine has:")
-        val coffeeBeansYouHave = readln().toInt()
-
-        val cupsOfCoffeeYouNeed = input()
-
-        val a = waterYouHave / water
-        val b = milkYouHave / milk
-        val c = coffeeBeansYouHave / coffee
-
-        val minCupsPosisble = listOf(a, b, c).sorted()[0]
-        println(minCupsPosisble)
-
-
-        val result = if (minCupsPosisble == cupsOfCoffeeYouNeed) {
-            "Yes, I can make that amount of coffee"
-        } else if (minCupsPosisble < cupsOfCoffeeYouNeed) {
-            "No, I can make only ${minCupsPosisble} cups of coffee"
-        } else if (minCupsPosisble > cupsOfCoffeeYouNeed) {
-            "Yes, I can make that amount of coffee (and even ${minCupsPosisble - cupsOfCoffeeYouNeed} more than that)"
-        } else "OK"
-
-        println(result)
-    }
-
+    //INITIALIZATION - IngredientsLeft
     var waterLeft = 400
     var milkLeft = 540
     var coffeeLeft = 120
@@ -93,63 +27,68 @@ class CoffeeMachine {
     val coffeeForCappuccino = 12
     val moneyForCappuccino = 6
 
-
-    fun showInfo() {
-        println(
-            """
-                The coffee machine has:
-                $waterLeft ml of water
-                $milkLeft ml of milk
-                $coffeeLeft g of coffee beans
-                $cupsLeft disposable cups
-                $$moneyLeft of money
-            """.trimIndent()
-        )
-    }
-
     fun selectProgram() {
-        println("\nWrite action (buy, fill, take): ")
+        println("\nWrite action (buy, fill, take, remaining, exit): ")
         val input = readln()
-        //"buy", "fill", "take"
-
         when (input) {
             "buy" -> buy()
             "fill" -> fill()
             "take" -> take()
+            "remaining" -> remaining()
+            "exit" -> exit()
+            else -> return
         }
         println()
     }
 
+    private fun exit() {
+        status = 0
+    }
+
     private fun buy() {
         println("\nWhat do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:")
-        val coffeeType = readln().toInt()
 
-        when (coffeeType) {
-            1 -> {
-                waterLeft -= waterForEspresso
-                coffeeLeft -= coffeeForEspresso
-                moneyLeft += moneyForEspresso
-                cupsLeft -= 1
+        val coffeeType = readln()
+
+        try {
+            val a = coffeeType.toIntOrNull()
+            val temp = ingridientsCalculator(a)
+
+            if (temp) {
+                when (a) {
+                    1 -> {
+                        waterLeft -= waterForEspresso
+                        coffeeLeft -= coffeeForEspresso
+                        moneyLeft += moneyForEspresso
+                        cupsLeft -= 1
+                    }
+
+                    2 -> {
+                        waterLeft -= waterForLatte
+                        milkLeft -= milkForLatte
+                        coffeeLeft -= coffeeForLatte
+                        moneyLeft += moneyForLatte
+                        cupsLeft -= 1
+
+                    }
+
+                    3 -> {
+                        waterLeft -= waterForCappuccino
+                        milkLeft -= milkForCappuccino
+                        coffeeLeft -= coffeeForCappuccino
+                        moneyLeft += moneyForCappuccino
+                        cupsLeft -= 1
+                    }
+
+                    else -> selectProgram()
+                }
+
             }
-
-            2 -> {
-                waterLeft -= waterForLatte
-                milkLeft -= milkForLatte
-                coffeeLeft -= coffeeForLatte
-                moneyLeft += moneyForLatte
-                cupsLeft -= 1
-
-            }
-
-            3 -> {
-                waterLeft -= waterForCappuccino
-                milkLeft -= milkForCappuccino
-                coffeeLeft -= coffeeForCappuccino
-                moneyLeft += moneyForCappuccino
-                cupsLeft -= 1
-            }
+        } finally {
+            selectProgram()
         }
     }
+
 
     private fun fill() {
         println("Write how many ml of water you want to add:")
@@ -168,9 +107,79 @@ class CoffeeMachine {
         moneyLeft = 0
     }
 
+    fun ingridientsCalculator(coffeeType: Int?): Boolean {
+
+        when (coffeeType) {
+            1 -> {
+                val a = waterLeft / waterForEspresso
+                val c = coffeeLeft / coffeeForEspresso
+
+                val minCupsPossible = listOf(a, c).sorted()[0]
+                println(minCupsPossible)
+
+
+                if (minCupsPossible >= 1 && cupsLeft >= 1) {
+                    println("I have enough resources, making you a coffee!")
+                    return true
+                } else if (a == 0) {
+                    println("Sorry, not enough water!")
+                    return false
+                } else if (c == 0) {
+                    println("Sorry, not enough coffee!")
+                    return false
+                } else {
+                    println("Sorry, not enough cups!")
+                    return false
+                }
+
+            }
+
+            2, 3 -> {
+                val a = waterLeft / waterForLatte
+                val b = milkLeft / milkForLatte
+                val c = coffeeLeft / coffeeForLatte
+
+                val minCupsPossible = listOf(a, b, c).sorted()[0]
+                println(minCupsPossible)
+
+
+                if (minCupsPossible >= 1 && cupsLeft >= 1) {
+                    println("I have enough resources, making you a coffee!")
+                    return true
+                } else if (a == 0) {
+                    println("Sorry, not enough water!")
+                    return false
+                } else if (b == 0) {
+                    println("Sorry, not enough milk!")
+                    return false
+                } else if (c == 0) {
+                    println("Sorry, not enough coffee!")
+                    return false
+                } else {
+                    println("Sorry, not enough cups!")
+                    return false
+                }
+            }
+
+            else -> {
+                selectProgram()
+                return false
+            }
+        }
+    }
+
+    fun remaining() {
+        println()
+        println(
+            """
+                The coffee machine has:
+                $waterLeft ml of water
+                $milkLeft ml of milk
+                $coffeeLeft g of coffee beans
+                $cupsLeft disposable cups
+                $$moneyLeft of money
+            """.trimIndent()
+        )
+    }
+
 }
-
-
-
-
-

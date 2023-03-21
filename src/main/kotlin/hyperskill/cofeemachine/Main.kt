@@ -1,13 +1,13 @@
 package hyperskill.cofeemachine
 
+import CoffeeMachine
+
 fun main() {
 
     val newCoffeeMachine = CoffeeMachine()
 
-    //newCoffeeMachine.inputCalcOutput()
-    //newCoffeeMachine.ingridientsCalculator()
+    while (newCoffeeMachine.status != 0) {
+        newCoffeeMachine.selectProgram()
+    }
 
-    newCoffeeMachine.showInfo()
-    newCoffeeMachine.selectProgram()
-    newCoffeeMachine.showInfo()
 }
